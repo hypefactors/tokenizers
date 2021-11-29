@@ -18,6 +18,9 @@ typedef struct FFITokenizer FFITokenizer_t;
 
 FFITokenizer_t * tokenizer_new (void);
 
+void tokenizer_encode (
+    FFITokenizer_t const * it);
+
 void tokenizer_drop (
     FFITokenizer_t * ptr);
 
@@ -26,7 +29,24 @@ void tokenizer_drop (
 #include <stdint.h>
 
 /** \brief
- *  Same as [`Vec<T>`][`rust::Vec`], but with guaranteed `#[repr(C)]` layout
+ *  [`Box`][`rust::Box`]`<[T]>` (fat pointer to a slice),
+ *  but with a guaranteed `#[repr(C)]` layout.
+ * 
+ *  # C layout (for some given type T)
+ * 
+ *  ```c
+ *  typedef struct {
+ *      // Cannot be NULL
+ *      T * ptr;
+ *      size_t len;
+ *  } slice_T;
+ *  ```
+ * 
+ *  # Nullable pointer?
+ * 
+ *  If you want to support the above typedef, but where the `ptr` field is
+ *  allowed to be `NULL` (with the contents of `len` then being undefined)
+ *  use the `Option< slice_ptr<_> >` type.
  */
 typedef struct {
 
@@ -34,22 +54,7 @@ typedef struct {
 
     size_t len;
 
-    size_t cap;
-
-} Vec_uint32_t;
-
-/** \brief
- *  Same as [`Vec<T>`][`rust::Vec`], but with guaranteed `#[repr(C)]` layout
- */
-typedef struct {
-
-    uint32_t * * ptr;
-
-    size_t len;
-
-    size_t cap;
-
-} Vec_uint32_ptr_t;
+} slice_boxed_uint32_t;
 
 /** \brief
  *  Same as [`Vec<T>`][`rust::Vec`], but with guaranteed `#[repr(C)]` layout
@@ -65,7 +70,24 @@ typedef struct {
 } Vec_uint8_t;
 
 /** \brief
- *  Same as [`Vec<T>`][`rust::Vec`], but with guaranteed `#[repr(C)]` layout
+ *  [`Box`][`rust::Box`]`<[T]>` (fat pointer to a slice),
+ *  but with a guaranteed `#[repr(C)]` layout.
+ * 
+ *  # C layout (for some given type T)
+ * 
+ *  ```c
+ *  typedef struct {
+ *      // Cannot be NULL
+ *      T * ptr;
+ *      size_t len;
+ *  } slice_T;
+ *  ```
+ * 
+ *  # Nullable pointer?
+ * 
+ *  If you want to support the above typedef, but where the `ptr` field is
+ *  allowed to be `NULL` (with the contents of `len` then being undefined)
+ *  use the `Option< slice_ptr<_> >` type.
  */
 typedef struct {
 
@@ -73,25 +95,45 @@ typedef struct {
 
     size_t len;
 
-    size_t cap;
+} slice_boxed_Vec_uint8_t;
 
-} Vec_Vec_uint8_t;
+/** \brief
+ *  [`Box`][`rust::Box`]`<[T]>` (fat pointer to a slice),
+ *  but with a guaranteed `#[repr(C)]` layout.
+ * 
+ *  # C layout (for some given type T)
+ * 
+ *  ```c
+ *  typedef struct {
+ *      // Cannot be NULL
+ *      T * ptr;
+ *      size_t len;
+ *  } slice_T;
+ *  ```
+ * 
+ *  # Nullable pointer?
+ * 
+ *  If you want to support the above typedef, but where the `ptr` field is
+ *  allowed to be `NULL` (with the contents of `len` then being undefined)
+ *  use the `Option< slice_ptr<_> >` type.
+ */
+typedef struct {
+
+    uint32_t * * ptr;
+
+    size_t len;
+
+} slice_boxed_uint32_ptr_t;
 
 typedef struct {
 
-    Vec_uint32_t ids;
+    slice_boxed_uint32_t ids;
 
-    Vec_uint32_t type_ids;
+    slice_boxed_uint32_t type_ids;
 
-    Vec_uint32_ptr_t foo;
+    slice_boxed_Vec_uint8_t tokens;
 
-    Vec_Vec_uint8_t tokens;
-
-    Vec_uint32_ptr_t words;
-
-    Vec_uint32_t special_token_mask;
-
-    Vec_uint32_t attention_mask;
+    slice_boxed_uint32_ptr_t words;
 
 } FFIEncoding_t;
 
