@@ -69,6 +69,38 @@ FFIEncoding_t * encode_from_str (
     char const * ffi_input,
     bool add_special_tokens);
 
+/** \brief
+ *  `&'lt [T]` but with a guaranteed `#[repr(C)]` layout.
+ * 
+ *  # C layout (for some given type T)
+ * 
+ *  ```c
+ *  typedef struct {
+ *      // Cannot be NULL
+ *      T * ptr;
+ *      size_t len;
+ *  } slice_T;
+ *  ```
+ * 
+ *  # Nullable pointer?
+ * 
+ *  If you want to support the above typedef, but where the `ptr` field is
+ *  allowed to be `NULL` (with the contents of `len` then being undefined)
+ *  use the `Option< slice_ptr<_> >` type.
+ */
+typedef struct {
+
+    char const * const * ptr;
+
+    size_t len;
+
+} slice_ref_char_const_ptr_t;
+
+FFIEncoding_t * encode_from_vec_str (
+    FFITokenizer_t const * it,
+    slice_ref_char_const_ptr_t ffi_input,
+    bool add_special_tokens);
+
 void tokenizer_drop (
     FFITokenizer_t * ptr);
 

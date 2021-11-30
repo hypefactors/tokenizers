@@ -1,6 +1,7 @@
 package co.huggingface.tokenizers;
 
 import com.sun.jna.*;
+import com.sun.jna.ptr.PointerByReference;
 
 import java.lang.ref.Cleaner;
 
@@ -22,5 +23,6 @@ public interface SaferFFITokenizersLibrary extends Library {
 
     // getting & dropping encoders
     SaferFFIEncoding encode_from_str(Pointer tokenizer, String input, int addSpecialTokens);
+    SaferFFIEncoding encode_from_vec_str(Pointer tokenizer, SaferFFIVec slice, int addSpecialTokens);
     void encoding_drop(Pointer encoding);
 }
