@@ -9,7 +9,6 @@ public class SaferFFIVecLong extends Structure {
     public SaferFFITokenizersLibrary.size_t len, cap;
     
     public long[] getArray() {
-        System.out.println("long vec len " + len.intValue());
         return ptr.getLongArray(0, len.intValue());
     } 
 }

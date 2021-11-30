@@ -9,7 +9,6 @@ public class SaferFFIVecString extends Structure {
     public SaferFFITokenizersLibrary.size_t len, cap;
 
     public String[] getArray() {
-        System.out.println("length " + len.intValue());
         return ptr.getStringArray(0, len.intValue());
     }
 }
