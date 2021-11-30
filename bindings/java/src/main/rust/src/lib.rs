@@ -11,6 +11,15 @@ pub struct FFITokenizer {
     tokenizer: Tokenizer
 }
 
+#[derive_ReprC]
+#[repr(C)]
+pub struct FFIEncoding {
+    ids: repr_c::Vec<i64>,
+    type_ids: repr_c::Vec<i64>,
+    tokens: repr_c::Vec<char_p::Box>,
+    words: repr_c::Vec<i64>,
+}
+
 #[ffi_export]
 fn tokenizer_new() -> repr_c::Box<FFITokenizer>
 {
@@ -24,10 +33,9 @@ fn tokenizer_new() -> repr_c::Box<FFITokenizer>
 }
 
 #[ffi_export]
-fn tokenizer_encode(it: &FFITokenizer) //-> repr_c::Box<FFIEncoding>
-//fn tokenizer_encode(it: &FFITokenizer, input: repr_c::String) -> repr_c::Box<FFIEncoding>
+fn tokenizer_encode(it: &FFITokenizer, ffi_input: char_p::Ref) -> repr_c::Box<FFIEncoding>
 {
-    let input = "hello I'm viet";
+    let input = ffi_input.to_str();
     let encoded = it.tokenizer.encode(input, false);
     match encoded {
         Err(_e) => panic!("encode failed"),
@@ -42,7 +50,7 @@ fn tokenizer_encode(it: &FFITokenizer) //-> repr_c::Box<FFIEncoding>
                 })
                 .collect::<Vec<_>>().into();
 
-            repr_c::Box::new(FFIEncoding { ids, type_ids, tokens, words });
+            repr_c::Box::new(FFIEncoding { ids, type_ids, tokens, words })
         },
     }
 }
@@ -51,15 +59,6 @@ fn tokenizer_encode(it: &FFITokenizer) //-> repr_c::Box<FFIEncoding>
 fn tokenizer_drop(ptr: repr_c::Box<FFITokenizer>)
 {
     drop(ptr);
-}
-
-#[derive_ReprC]
-#[repr(C)]
-pub struct FFIEncoding {
-    ids: repr_c::Vec<i64>,
-    type_ids: repr_c::Vec<i64>,
-    tokens: repr_c::Vec<char_p::Box>,
-    words: repr_c::Vec<i64>,
 }
 
 #[ffi_export]

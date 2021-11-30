@@ -18,12 +18,6 @@ typedef struct FFITokenizer FFITokenizer_t;
 
 FFITokenizer_t * tokenizer_new (void);
 
-void tokenizer_encode (
-    FFITokenizer_t const * it);
-
-void tokenizer_drop (
-    FFITokenizer_t * ptr);
-
 
 #include <stddef.h>
 #include <stdint.h>
@@ -65,6 +59,13 @@ typedef struct {
     Vec_int64_t words;
 
 } FFIEncoding_t;
+
+FFIEncoding_t * tokenizer_encode (
+    FFITokenizer_t const * it,
+    char const * ffi_input);
+
+void tokenizer_drop (
+    FFITokenizer_t * ptr);
 
 void encoding_drop (
     FFIEncoding_t * ptr);
