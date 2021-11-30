@@ -9,6 +9,9 @@ public class App {
 
         var tokenizer = new Tokenizer("labse");
         var encoding = tokenizer.encode(str);
-        System.out.println(encoding);
+        System.out.println(Arrays.toString(encoding.getIds()));
+        System.out.println(Arrays.toString(encoding.getTypeIds()));
+        System.out.println(Arrays.toString(encoding.getWordIds()));
+        System.out.println(Arrays.toString(encoding.getTokens()));
     }
 }
