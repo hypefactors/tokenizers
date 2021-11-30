@@ -20,6 +20,9 @@ FFITokenizer_t * tokenizer_from_pretrained (
     char const * ffi_identifier);
 
 
+#include <stdbool.h>
+
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -63,7 +66,8 @@ typedef struct {
 
 FFIEncoding_t * encode_from_str (
     FFITokenizer_t const * it,
-    char const * ffi_input);
+    char const * ffi_input,
+    bool add_special_tokens);
 
 void tokenizer_drop (
     FFITokenizer_t * ptr);

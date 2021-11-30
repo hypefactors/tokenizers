@@ -17,10 +17,10 @@ public interface SaferFFITokenizersLibrary extends Library {
     }
 
     // getting & dropping tokenizers
-    Pointer tokenizer_new();
+    Pointer tokenizer_from_pretrained(String identifier);
     void tokenizer_drop(Pointer tokenizer);
 
     // getting & dropping encoders
-    SaferFFIEncoding tokenizer_encode(Pointer tokenizer, String input);
+    SaferFFIEncoding encode_from_str(Pointer tokenizer, String input, int addSpecialTokens);
     void encoding_drop(Pointer encoding);
 }

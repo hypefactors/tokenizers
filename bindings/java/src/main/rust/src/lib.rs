@@ -96,12 +96,11 @@ fn tokenizer_from_pretrained(ffi_identifier: char_p::Ref ) -> repr_c::Box<FFITok
 }
 
 #[ffi_export]
-fn encode_from_str(it: &FFITokenizer, ffi_input: char_p::Ref) -> repr_c::Box<FFIEncoding> {
+fn encode_from_str(it: &FFITokenizer, ffi_input: char_p::Ref, add_special_tokens: bool) -> repr_c::Box<FFIEncoding> {
     let input = ffi_input.to_str();
-    let encoded = it.encode_from_str(input, false);
+    let encoded = it.encode_from_str(input, add_special_tokens);
     repr_c::Box::new(encoded)
 }
-
 
 #[ffi_export]
 fn tokenizer_drop(ptr: repr_c::Box<FFITokenizer>) {

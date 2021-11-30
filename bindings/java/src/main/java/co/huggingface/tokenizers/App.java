@@ -3,13 +3,13 @@ package co.huggingface.tokenizers;
 public class App {
 
     public static void main(String[] args) {
-        var str = "Hello World, this is Viet and Andrea testing their new tokenizer in the JVM";
+        var str = "My name is John";
 
-        var tokenizer = new Tokenizer("labse");
-        var encoding = tokenizer.encode(str);
-        //System.out.println(Arrays.toString(encoding.getIds()));
+        var tokenizer = new TokenizerFromPretrained("bert-base-cased");
+        var encoding = tokenizer.encode(str, true);
+        System.out.println(encoding.getIds());
         //System.out.println(Arrays.toString(encoding.getTypeIds()));
         //System.out.println(Arrays.toString(encoding.getWordIds()));
-        //System.out.println(Arrays.toString(encoding.getTokens()));
+        System.out.println(encoding.getTokens());
     }
 }
