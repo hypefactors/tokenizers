@@ -2,8 +2,13 @@ package co.huggingface.tokenizers;
 
 import com.sun.jna.*;
 
+import java.lang.ref.Cleaner;
+
 public interface SaferFFITokenizersLibrary extends Library {
     SaferFFITokenizersLibrary INSTANCE = (SaferFFITokenizersLibrary) Native.load("safer_ffi_tokenizers", SaferFFITokenizersLibrary.class);
+
+    // to automatically free memory on the Rust side when GC'ed on JVM
+    static final Cleaner cleaner = Cleaner.create();
 
     // handling unsigned ints as size_t
     public static class size_t extends IntegerType {
