@@ -1,36 +1,43 @@
+plugins {
+    id 'application'
+}
+
+group 'co.huggingface'
+version '1.0-SNAPSHOT'
+
 repositories {
     mavenCentral()
 }
 
 def moveTarget(String os) {
-   def buildDir = "${project.buildDir}/classes/java/main/${os}-x86-64"
-   file(buildDir).mkdirs()
+    def buildDir = "${project.buildDir}/classes/java/main/${os}-x86-64"
+    file(buildDir).mkdirs()
 
-   def targetDir = "${project.projectDir}/src/main/rust/target/debug"
-   def tree = fileTree(targetDir)
+    def targetDir = "${project.projectDir}/src/main/rust/target/debug"
+    def tree = fileTree(targetDir)
 
-   tree.include("libtokenizers_jna.*")
+    tree.include("libsafer_ffi_tokenizers.*")
 
-   copy {
-       from tree.files
-
-       into buildDir
-   }
+    copy {
+        from tree.files
+        into buildDir
+    }
 }
 
 task buildProject(dependsOn: 'compileJava') {
-    doLast{
-     exec {
-            commandLine 'bash', 'build.sh'
+    doLast {
+        exec {
+            workingDir 'src/main/rust'
+            commandLine 'cargo', 'build'
         }
 
-       def currentOs = System.properties['os.name']
+        def currentOs = System.properties['os.name']
+
         if (currentOs.startsWith("Mac")) {
             moveTarget("darwin")
-        }else if (currentOs.startsWith("Linux")){
-          moveTarget("linux")
-        }
-        else {
+        } else if (currentOs.startsWith("Linux")) {
+            moveTarget("linux")
+        } else {
             throw new IllegalStateException("Unsupported os: " + currentOs)
         }
     }
@@ -48,7 +55,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'co.hugginface.tokenizers.App'
+    mainClass = 'co.huggingface.tokenizers.App'
 }
 
 test {
