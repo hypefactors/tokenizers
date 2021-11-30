@@ -28,8 +28,14 @@ impl FFITokenizer {
         let encoded = self.tokenizer.encode(single_input_sequence, add_special_tokens).expect("encoding failed");
         return FFIEncoding::from_rust(encoded);
     }
+    pub fn encode_from_vec_str(&self, input: &str, add_special_tokens: bool) -> FFIEncoding {
+        let input_sequence = InputSequence::from(input);
+        let single_input_sequence = EncodeInput::Single(input_sequence);
+        let encoded = self.tokenizer.encode(single_input_sequence, add_special_tokens).expect("encoding failed");
+        return FFIEncoding::from_rust(encoded);
+    }
+
     //TODO: Andrea
-    //encode from vec str
     //encode_pair_from_str
     //encode_pair_from_vec_str
 

@@ -16,7 +16,8 @@ extern "C" {
 
 typedef struct FFITokenizer FFITokenizer_t;
 
-FFITokenizer_t * tokenizer_new (void);
+FFITokenizer_t * tokenizer_from_pretrained (
+    char const * ffi_identifier);
 
 
 #include <stddef.h>
@@ -60,7 +61,7 @@ typedef struct {
 
 } FFIEncoding_t;
 
-FFIEncoding_t * tokenizer_encode (
+FFIEncoding_t * encode_from_str (
     FFITokenizer_t const * it,
     char const * ffi_input);
 
