@@ -11,6 +11,16 @@ pub struct FFITokenizer {
     tokenizer: Tokenizer,
 }
 
+impl FFITokenizer {
+
+    pub fn from_pretrained(identifier: &str) -> FFITokenizer {
+        let parameters = FromPretrainedParameters::default();
+        let tk_result = Tokenizer::from_pretrained(identifier, Some(parameters)).expect("identifier not found");
+        return FFITokenizer { tokenizer: tk_result }
+    }
+
+}
+
 #[derive_ReprC]
 #[repr(C)]
 pub struct FFIEncoding {
@@ -21,14 +31,9 @@ pub struct FFIEncoding {
 }
 
 #[ffi_export]
-fn tokenizer_new() -> repr_c::Box<FFITokenizer> {
-    let identifier = "setu4993/LaBSE";
-    let parameters = FromPretrainedParameters::default();
-    let tk_result = Tokenizer::from_pretrained(identifier, Some(parameters));
-    match tk_result {
-        Err(_e) => panic!("identifier not found"),
-        Ok(v) => repr_c::Box::new(FFITokenizer { tokenizer: v }),
-    }
+fn tokenizer_from_pretrained(ffi_identifier: char_p::Ref ) -> repr_c::Box<FFITokenizer> {
+    let input = ffi_identifier.to_str();
+    repr_c::Box::new(FFITokenizer::from_pretrained(input))
 }
 
 #[ffi_export]
