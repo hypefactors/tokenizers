@@ -1,5 +1,7 @@
 plugins {
+    //TODO: make type library and move App to examples
     id 'application'
+    id "com.diffplug.spotless" version "6.0.0"
 }
 
 group 'co.huggingface'
@@ -46,6 +48,16 @@ task buildProject(dependsOn: 'compileJava') {
 
 clean.doFirst {
     delete "./src/main/rust/target"
+}
+
+spotless {
+    format 'misc', {
+        target '*.properties','*.gradle', '*.md', '.gitignore' // etc.
+    }
+    java {
+        indentWithSpaces()
+        removeUnusedImports()
+    }
 }
 
 dependencies {
