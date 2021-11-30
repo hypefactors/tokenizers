@@ -29,111 +29,25 @@ void tokenizer_drop (
 #include <stdint.h>
 
 /** \brief
- *  [`Box`][`rust::Box`]`<[T]>` (fat pointer to a slice),
- *  but with a guaranteed `#[repr(C)]` layout.
- * 
- *  # C layout (for some given type T)
- * 
- *  ```c
- *  typedef struct {
- *      // Cannot be NULL
- *      T * ptr;
- *      size_t len;
- *  } slice_T;
- *  ```
- * 
- *  # Nullable pointer?
- * 
- *  If you want to support the above typedef, but where the `ptr` field is
- *  allowed to be `NULL` (with the contents of `len` then being undefined)
- *  use the `Option< slice_ptr<_> >` type.
- */
-typedef struct {
-
-    uint32_t * ptr;
-
-    size_t len;
-
-} slice_boxed_uint32_t;
-
-/** \brief
  *  Same as [`Vec<T>`][`rust::Vec`], but with guaranteed `#[repr(C)]` layout
  */
 typedef struct {
 
-    uint8_t * ptr;
+    int64_t * ptr;
 
     size_t len;
 
     size_t cap;
 
-} Vec_uint8_t;
-
-/** \brief
- *  [`Box`][`rust::Box`]`<[T]>` (fat pointer to a slice),
- *  but with a guaranteed `#[repr(C)]` layout.
- * 
- *  # C layout (for some given type T)
- * 
- *  ```c
- *  typedef struct {
- *      // Cannot be NULL
- *      T * ptr;
- *      size_t len;
- *  } slice_T;
- *  ```
- * 
- *  # Nullable pointer?
- * 
- *  If you want to support the above typedef, but where the `ptr` field is
- *  allowed to be `NULL` (with the contents of `len` then being undefined)
- *  use the `Option< slice_ptr<_> >` type.
- */
-typedef struct {
-
-    Vec_uint8_t * ptr;
-
-    size_t len;
-
-} slice_boxed_Vec_uint8_t;
-
-/** \brief
- *  [`Box`][`rust::Box`]`<[T]>` (fat pointer to a slice),
- *  but with a guaranteed `#[repr(C)]` layout.
- * 
- *  # C layout (for some given type T)
- * 
- *  ```c
- *  typedef struct {
- *      // Cannot be NULL
- *      T * ptr;
- *      size_t len;
- *  } slice_T;
- *  ```
- * 
- *  # Nullable pointer?
- * 
- *  If you want to support the above typedef, but where the `ptr` field is
- *  allowed to be `NULL` (with the contents of `len` then being undefined)
- *  use the `Option< slice_ptr<_> >` type.
- */
-typedef struct {
-
-    uint32_t * * ptr;
-
-    size_t len;
-
-} slice_boxed_uint32_ptr_t;
+} Vec_int64_t;
 
 typedef struct {
 
-    slice_boxed_uint32_t ids;
+    Vec_int64_t ids;
 
-    slice_boxed_uint32_t type_ids;
+    Vec_int64_t type_ids;
 
-    slice_boxed_Vec_uint8_t tokens;
-
-    slice_boxed_uint32_ptr_t words;
+    Vec_int64_t words;
 
 } FFIEncoding_t;
 

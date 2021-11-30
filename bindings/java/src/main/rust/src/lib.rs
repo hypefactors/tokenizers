@@ -32,17 +32,17 @@ fn tokenizer_encode(it: &FFITokenizer) //-> repr_c::Box<FFIEncoding>
     match encoded {
         Err(_e) => panic!("encode failed"),
         Ok(encoding) => {
-            let foo: Vec<repr_c::String> = encoding.get_tokens().into_iter().map(|s| repr_c::String::from(s.clone())).rev().collect();
-            let bar: Vec<Option<repr_c::Box<u32>>> = encoding.get_word_ids().into_iter()
-                .map(|x| x.map(|y| repr_c::Box::new(y)))
-                .rev().collect();
+            let ids = encoding.get_ids().iter().map(|i|i64::from(*i)).collect::<Vec<_>>().into();
+            let type_ids = encoding.get_type_ids().iter().map(|i|i64::from(*i)).collect::<Vec<_>>().into();
+            // let foo: Vec<repr_c::String> = encoding.get_tokens().into_iter().map(|s| repr_c::String::from(s.clone())).rev().collect();
+            let words = encoding.get_word_ids().iter()
+                .map(|w| match w {
+                    Some(v) => i64::from(*v),
+                    None => -1, // to indicate null
+                })
+                .collect::<Vec<_>>().into();
 
-            repr_c::Box::new(FFIEncoding {
-                ids: encoding.get_ids().to_vec().into_boxed_slice().into(),
-                type_ids: encoding.get_type_ids().to_vec().into_boxed_slice().into(),
-                tokens: foo.into_boxed_slice().into(),
-                words: bar.into_boxed_slice().into(),
-            });
+            repr_c::Box::new(FFIEncoding { ids, type_ids, words });
         },
     }
 }
@@ -56,10 +56,10 @@ fn tokenizer_drop(ptr: repr_c::Box<FFITokenizer>)
 #[derive_ReprC]
 #[repr(C)]
 pub struct FFIEncoding {
-    ids: c_slice::Box<u32>,
-    type_ids: c_slice::Box<u32>,
-    tokens: c_slice::Box<repr_c::String>,
-    words: c_slice::Box<Option<repr_c::Box<u32>>>,
+    ids: repr_c::Vec<i64>,
+    type_ids: repr_c::Vec<i64>,
+    // tokens: c_slice::Box<repr_c::String>,
+    words: repr_c::Vec<i64>,
 }
 
 #[ffi_export]
