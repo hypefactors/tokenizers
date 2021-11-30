@@ -34,7 +34,7 @@ fn tokenizer_encode(it: &FFITokenizer) //-> repr_c::Box<FFIEncoding>
         Ok(encoding) => {
             let ids = encoding.get_ids().iter().map(|i|i64::from(*i)).collect::<Vec<_>>().into();
             let type_ids = encoding.get_type_ids().iter().map(|i|i64::from(*i)).collect::<Vec<_>>().into();
-            // let foo: Vec<repr_c::String> = encoding.get_tokens().into_iter().map(|s| repr_c::String::from(s.clone())).rev().collect();
+            let tokens = encoding.get_tokens().iter().map(|s| char_p::new(s.clone())).collect::<Vec<_>>().into();
             let words = encoding.get_word_ids().iter()
                 .map(|w| match w {
                     Some(v) => i64::from(*v),
@@ -42,7 +42,7 @@ fn tokenizer_encode(it: &FFITokenizer) //-> repr_c::Box<FFIEncoding>
                 })
                 .collect::<Vec<_>>().into();
 
-            repr_c::Box::new(FFIEncoding { ids, type_ids, words });
+            repr_c::Box::new(FFIEncoding { ids, type_ids, tokens, words });
         },
     }
 }
@@ -58,7 +58,7 @@ fn tokenizer_drop(ptr: repr_c::Box<FFITokenizer>)
 pub struct FFIEncoding {
     ids: repr_c::Vec<i64>,
     type_ids: repr_c::Vec<i64>,
-    // tokens: c_slice::Box<repr_c::String>,
+    tokens: repr_c::Vec<char_p::Box>,
     words: repr_c::Vec<i64>,
 }
 

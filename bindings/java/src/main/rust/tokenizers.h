@@ -41,11 +41,26 @@ typedef struct {
 
 } Vec_int64_t;
 
+/** \brief
+ *  Same as [`Vec<T>`][`rust::Vec`], but with guaranteed `#[repr(C)]` layout
+ */
+typedef struct {
+
+    char * * ptr;
+
+    size_t len;
+
+    size_t cap;
+
+} Vec_char_ptr_t;
+
 typedef struct {
 
     Vec_int64_t ids;
 
     Vec_int64_t type_ids;
+
+    Vec_char_ptr_t tokens;
 
     Vec_int64_t words;
 
