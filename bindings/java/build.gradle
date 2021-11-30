@@ -30,8 +30,8 @@ task buildProject(dependsOn: 'compileJava') {
     doLast {
         exec {
             workingDir 'src/main/rust'
+            commandLine 'cargo', 'build' // , '--release'
             commandLine 'cargo', 'test', '--features', 'c-headers', '--', 'generate_headers'
-//            commandLine 'cargo', 'build', '--release'
         }
 
         def currentOs = System.properties['os.name']
