@@ -17,7 +17,7 @@ def moveTarget(String os) {
     def buildDir = "${project.buildDir}/classes/java/main/${os}-x86-64"
     file(buildDir).mkdirs()
 
-    def targetDir = "${project.projectDir}/src/main/rust/target/debug"
+    def targetDir = "${project.projectDir}/src/main/rust/target/release"
     def tree = fileTree(targetDir)
 
     tree.include("libsafer_ffi_tokenizers.*")
@@ -31,7 +31,7 @@ def moveTarget(String os) {
 task buildProject(dependsOn: 'compileJava') {
     doLast {
          exec {
-                    commandLine 'bash', 'build.sh'
+             commandLine 'bash', 'build.sh'
          }
 
         def currentOs = System.properties['os.name']
