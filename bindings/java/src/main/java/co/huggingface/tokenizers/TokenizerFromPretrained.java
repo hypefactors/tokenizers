@@ -47,19 +47,15 @@ public class TokenizerFromPretrained extends PointerType {
 //    }
 
     public List<Encoding> java_encode_batch(List<String> input, Boolean addSpecialTokens) {
-        StringArray sarray = new StringArray(input.toArray(new String[0]));
-        Pointer p = sarray.getPointer(0);
-        //PointerByReference refe = new PointerByReference();
-        //refe.setPointer(p);
-        SaferFFIVec slice = new SaferFFIVec();
-        slice.ptr = p;
-        slice.len = new SaferFFITokenizersLibrary.size_t(input.size());
-        slice.cap = new SaferFFITokenizersLibrary.size_t(input.size());
-        //var vec = (SaferFFIVec) Structure.newInstance(SaferFFIVec.class, myPointer);
-        //SaferFFIVec encode_batch
-        var encodings = SaferFFITokenizersLibrary.INSTANCE.encode_batch2(this.getPointer(), slice, 1);
-        var encodingsArray = getEncodings(encodings.ptr, encodings.len.intValue());
-        return Arrays.asList(encodingsArray).stream().map(Encoding::new).collect(Collectors.toList());
+        SaferFFIVec vec = new SaferFFIVec();
+        vec.ptr = new StringArray(input.toArray(new String[0]));
+        vec.len = new SaferFFITokenizersLibrary.size_t(input.size());
+        vec.cap = new SaferFFITokenizersLibrary.size_t(input.size());
+        System.out.println(vec);
+        var encodings = SaferFFITokenizersLibrary.INSTANCE.encode_batch2(this.getPointer(), vec, addSpecialTokens ? 1 : 0);
+//        var encodingsArray = getEncodings(encodings.ptr, encodings.len.intValue());
+//        return Arrays.asList(encodingsArray).stream().map(Encoding::new).collect(Collectors.toList());
+        return null;
     }
 
     public  SaferFFIEncoding[] getEncodings(Pointer ptr, int len){

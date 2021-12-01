@@ -24,7 +24,7 @@ public interface SaferFFITokenizersLibrary extends Library {
     // getting & dropping encoders
     SaferFFIEncoding encode_from_str(Pointer tokenizer, String input, int addSpecialTokens);
     //SaferFFIEncoding encode_from_vec_str(Pointer tokenizer, SaferFFIVec slice, int addSpecialTokens);
-    SaferFFIVecEncoding encode_batch2(Pointer tokenizer, SaferFFIVec slice, int addSpecialTokens);
+    SaferFFIVec encode_batch2(Pointer tokenizer, SaferFFIVec slice, int addSpecialTokens);
 
     void encoding_drop(Pointer encoding);
 }

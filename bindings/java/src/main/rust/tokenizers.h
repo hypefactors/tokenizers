@@ -85,7 +85,7 @@ typedef struct {
 void encode_batch2 (
     FFITokenizer_t const * it,
     Vec_char_const_ptr_t const * ffi_input,
-    uint8_t add_special_tokens);
+    bool add_special_tokens);
 
 void tokenizer_drop (
     FFITokenizer_t * ptr);

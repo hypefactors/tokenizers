@@ -138,15 +138,28 @@ fn encode_from_str(it: &FFITokenizer, ffi_input: char_p::Ref, add_special_tokens
 
 
 #[ffi_export]
-fn encode_batch2(it: &FFITokenizer, ffi_input: &repr_c::Vec<char_p::Ref>, add_special_tokens: i8) -> repr_c::Vec<FFIEncoding>  {
-    let vec_input = ffi_input.to_vec()
-        .map(|w| w.to_str())
-        .collect::<Vec<_>>();
-    let input_sequence = InputSequence::VecStr(&*vec_input);
-    let input = vec![input_sequence];
-    let add_special_tokens_bool = if add_special_tokens > 0 { true } else { false };
-    let encoded = it.encode_batch(&input, add_special_tokens_bool);
-    return encoded;
+fn encode_batch2(it: &FFITokenizer, ffi_input: &repr_c::Vec<char_p::Ref>, add_special_tokens: bool) // -> repr_c::Vec<FFIEncoding>  {
+{
+    println!("start");
+    let iter = ffi_input.iter();
+    println!("foo");
+    println!("len {}", ffi_input.len());
+    // println!("count {}", iter.count());
+    iter.for_each(|x| {
+        println!("count");
+        let s = x.to_str().to_string();
+        println!("{}", s);
+    });
+    println!("end");
+
+    // let vec_input = ffi_input.to_vec()
+    //     .map(|w| w.to_str())
+    //     .collect::<Vec<_>>();
+    // let input_sequence = InputSequence::VecStr(&*vec_input);
+    // let input = vec![input_sequence];
+    // let add_special_tokens_bool = if add_special_tokens > 0 { true } else { false };
+    // let encoded = it.encode_batch(&input, add_special_tokens_bool);
+    // return encoded;
 }
 
 
