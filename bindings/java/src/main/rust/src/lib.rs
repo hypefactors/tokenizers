@@ -42,7 +42,7 @@ impl FFITokenizer {
     }
 
     pub fn encode_batch(&self, input: &Vec<InputSequence>, add_special_tokens: bool) -> repr_c::Vec<repr_c::Box<FFIEncoding>> {
-        let encode_inputs: Vec<tk::EncodeInput> = input.as_slice().iter()
+        let encode_inputs: Vec<tk::EncodeInput> = input.iter()
             .map(|w| match *w {
                 InputSequence::Str(sequence)  =>
                     EncodeInput::Single(tk::InputSequence::from(sequence)),
@@ -53,7 +53,7 @@ impl FFITokenizer {
             .collect::<Vec<_>>();
 
             let encoded = self.tokenizer.encode_batch(encode_inputs, add_special_tokens).expect("encoding failed");
-            let ffi_encodings = encoded.as_slice().iter()
+            let ffi_encodings = encoded.iter()
                 .map(|e |  repr_c::Box::new(FFIEncoding::from_rust(e.clone()))).collect::<Vec<_>>().into();
             return ffi_encodings;
         }
