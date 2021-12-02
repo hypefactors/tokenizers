@@ -10,7 +10,7 @@ use tk::tokenizer::{EncodeInput, Encoding};
 #[repr(C)]
 pub struct FFIResult<T> {
     value: Option<repr_c::Box<T>>,
-    error: Option<repr_c::Box<char_p_boxed>>,
+    error: Option<char_p::Box>,
 }
 
 #[derive_ReprC]
@@ -29,7 +29,7 @@ impl FFITokenizer {
         let parameters = FromPretrainedParameters::default();
         let tk_result = Tokenizer::from_pretrained(identifier, Some(parameters));
         let error = (&tk_result).as_ref().err().map(|e| {
-            repr_c::Box::new(char_p::new(e.to_string()))
+            char_p::new(e.to_string())
         });
         let value = tk_result.ok().map(|tokenizer| repr_c::Box::new(FFITokenizer { tokenizer }));
         FFIResult { value, error }
@@ -124,7 +124,7 @@ fn encode_batch(it: &FFITokenizer, ffi_input: &repr_c::Vec<char_p::Ref>, add_spe
 }
 
 #[ffi_export]
-fn tokenizer_drop(ptr: repr_c::Box<FFITokenizer>) {
+fn tokenizer_drop(ptr: repr_c::Box<FFIResult<FFITokenizer>>) {
     drop(ptr);
 }
 

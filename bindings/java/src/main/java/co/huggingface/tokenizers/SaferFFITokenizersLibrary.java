@@ -18,8 +18,8 @@ public interface SaferFFITokenizersLibrary extends Library {
     }
 
     // getting & dropping tokenizers
-    Pointer tokenizer_from_pretrained(String identifier);
-    void tokenizer_drop(Pointer tokenizer);
+    SaferFFIOpaqueResult tokenizer_from_pretrained(String identifier);
+    void tokenizer_drop(Pointer tokenizerResult);
 
     // getting & dropping encoders
     SaferFFIEncoding encode_from_str(Pointer tokenizer, String input, int addSpecialTokens);

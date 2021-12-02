@@ -20,7 +20,7 @@ typedef struct {
 
     FFITokenizer_t * value;
 
-    char * * error;
+    char * error;
 
 } FFIResult_FFITokenizer_t;
 
@@ -114,7 +114,7 @@ Vec_FFIEncoding_ptr_t * encode_batch (
     bool add_special_tokens);
 
 void tokenizer_drop (
-    FFITokenizer_t * ptr);
+    FFIResult_FFITokenizer_t * ptr);
 
 void encoding_drop (
     FFIEncoding_t * ptr);
