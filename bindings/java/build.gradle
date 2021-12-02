@@ -28,11 +28,11 @@ def moveTarget(String os) {
     }
 }
 
-task buildProject(dependsOn: 'compileJava') {
+task buildProject {
+    inputs.dir('src/main/rust')
+    outputs.dir('src/main/rust/target')
     doLast {
-         exec {
-             commandLine 'bash', 'build.sh'
-         }
+        exec { commandLine 'bash', 'build.sh' }
 
         def currentOs = System.properties['os.name']
 
@@ -46,7 +46,10 @@ task buildProject(dependsOn: 'compileJava') {
     }
 }
 
+compileJava.dependsOn buildProject
+
 jmh {
+    jvmArgs = ['-Djmh.ignoreLock=true']
     download {
         src 'https://norvig.com/big.txt'
         dest 'src/jmh/resources'

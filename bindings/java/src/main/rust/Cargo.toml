@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tokenizers = {  path = "../../../../../tokenizers", version = "0.11.0" }
-safer-ffi = { version = "*", features = ["proc_macros"] }
+tokenizers = {  path = "../../../../../tokenizers", version = "*" }
+safer-ffi = { version = "0.0.6", features = ["proc_macros"] }
 libc = "0.2"
 
 [lib]
