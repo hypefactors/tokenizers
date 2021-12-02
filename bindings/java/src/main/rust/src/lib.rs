@@ -1,9 +1,17 @@
 extern crate tokenizers as tk;
 
 use ::safer_ffi::prelude::*;
+use safer_ffi::char_p::char_p_boxed;
 use tk::FromPretrainedParameters;
 use tk::Tokenizer;
 use tk::tokenizer::{EncodeInput, Encoding};
+
+#[derive_ReprC]
+#[repr(C)]
+pub struct FFIResult<T> {
+    value: Option<repr_c::Box<T>>,
+    error: Option<repr_c::Box<char_p_boxed>>,
+}
 
 #[derive_ReprC]
 #[ReprC::opaque]
@@ -17,10 +25,14 @@ pub enum InputSequence<'s> {
 }
 
 impl FFITokenizer {
-    pub fn from_pretrained(identifier: &str) -> FFITokenizer {
+    pub fn from_pretrained(identifier: &str) -> FFIResult<FFITokenizer> {
         let parameters = FromPretrainedParameters::default();
-        let tk_result = Tokenizer::from_pretrained(identifier, Some(parameters)).expect("identifier not found");
-        return FFITokenizer { tokenizer: tk_result }
+        let tk_result = Tokenizer::from_pretrained(identifier, Some(parameters));
+        let error = (&tk_result).as_ref().err().map(|e| {
+            repr_c::Box::new(char_p::new(e.to_string()))
+        });
+        let value = tk_result.ok().map(|tokenizer| repr_c::Box::new(FFITokenizer { tokenizer }));
+        FFIResult { value, error }
     }
 
     pub fn encode(&self, input: &InputSequence, add_special_tokens: bool) -> FFIEncoding {
@@ -35,7 +47,7 @@ impl FFITokenizer {
     }
 
     pub fn encode_batch(&self, input: &Vec<InputSequence>, add_special_tokens: bool) -> repr_c::Vec<repr_c::Box<FFIEncoding>> {
-        let encode_inputs: Vec<tk::EncodeInput> = input.as_slice().iter()
+        let encode_inputs: Vec<tk::EncodeInput> = input.iter()
             .map(|w| match *w {
                 InputSequence::Str(sequence) =>
                     EncodeInput::Single(tk::InputSequence::from(sequence)),
@@ -45,7 +57,7 @@ impl FFITokenizer {
             .collect::<Vec<_>>();
 
         let encoded = self.tokenizer.encode_batch(encode_inputs, add_special_tokens).expect("encoding failed");
-        let ffi_encodings = encoded.as_slice().iter()
+        let ffi_encodings = encoded.iter()
             .map(|e| repr_c::Box::new(FFIEncoding::from_rust(e.clone()))).collect::<Vec<_>>().into();
         return ffi_encodings;
     }
@@ -79,7 +91,7 @@ impl FFIEncoding {
 }
 
 #[ffi_export]
-fn tokenizer_from_pretrained(ffi_identifier: char_p::Ref) -> repr_c::Box<FFITokenizer> {
+fn tokenizer_from_pretrained(ffi_identifier: char_p::Ref) -> repr_c::Box<FFIResult<FFITokenizer>> {
     let input = ffi_identifier.to_str();
     repr_c::Box::new(FFITokenizer::from_pretrained(input))
 }

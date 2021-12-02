@@ -16,7 +16,15 @@ extern "C" {
 
 typedef struct FFITokenizer FFITokenizer_t;
 
-FFITokenizer_t * tokenizer_from_pretrained (
+typedef struct {
+
+    FFITokenizer_t * value;
+
+    char * * error;
+
+} FFIResult_FFITokenizer_t;
+
+FFIResult_FFITokenizer_t * tokenizer_from_pretrained (
     char const * ffi_identifier);
 
 
