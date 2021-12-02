@@ -2,10 +2,6 @@ package co.huggingface.tokenizers;
 
 import com.sun.jna.Pointer;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class Encoding {
 
     private SaferFFIEncoding ffiEncoding;
@@ -32,27 +28,23 @@ public class Encoding {
         SaferFFITokenizersLibrary.cleaner.register(this, new CleanEncoding(ffiEncoding.getPointer()));
     }
 
-    public List<Long> getIds() {
+    public long[] getIds() {
         SaferFFIVec ids = ffiEncoding.ids;
-        long[] idsArray =  ids.ptr.getLongArray(0, ids.len.intValue());
-        return Arrays.stream(idsArray).boxed().collect(Collectors.toList());
+        return ids.ptr.getLongArray(0, ids.len.intValue());
     }
 
-    public List<Long> getTypeIds() {
+    public long[] getTypeIds() {
         SaferFFIVec typeIds = ffiEncoding.type_ids;
-        long[] typeIdsArray = typeIds.ptr.getLongArray(0, typeIds.len.intValue());
-        return Arrays.stream(typeIdsArray).boxed().collect(Collectors.toList());
+        return typeIds.ptr.getLongArray(0, typeIds.len.intValue());
     }
 
-    public List<Long> getWordIds() {
+    public long[] getWordIds() {
         SaferFFIVec wordIds = ffiEncoding.words;
-        long[] wordIdsArray = wordIds.ptr.getLongArray(0, wordIds.len.intValue());
-        return Arrays.stream(wordIdsArray).boxed().collect(Collectors.toList());
+        return wordIds.ptr.getLongArray(0, wordIds.len.intValue());
     }
 
-    public List<String> getTokens() {
+    public String[] getTokens() {
         SaferFFIVec tokens = ffiEncoding.tokens;
-        String[] tokensArray = tokens.ptr.getStringArray(0, tokens.len.intValue());
-        return Arrays.asList(tokensArray);
+        return tokens.ptr.getStringArray(0, tokens.len.intValue());
     }
 }

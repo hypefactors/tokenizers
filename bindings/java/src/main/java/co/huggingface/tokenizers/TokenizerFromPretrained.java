@@ -55,17 +55,4 @@ public class TokenizerFromPretrained extends PointerType {
         return encodingArray.getEncodings();
     }
 
-    public  Encoding[] getEncodings(Pointer ptr, int len){
-        Pointer[] parray = ptr.getPointerArray(0, len);
-        Encoding[] encodings = new Encoding[len];
-
-        for (int i = 0; i < len; i++) {
-            Pointer pp = parray[i];
-            SaferFFIEncoding ffiEncoding = new SaferFFIEncoding(pp);
-            encodings[i] = new Encoding(ffiEncoding);
-        }
-
-        return encodings;
-    }
-
 }
