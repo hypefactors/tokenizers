@@ -1,10 +1,9 @@
 extern crate tokenizers as tk;
 
 use ::safer_ffi::prelude::*;
-
 use tk::FromPretrainedParameters;
 use tk::Tokenizer;
-use tk::tokenizer::{Encoding, EncodeInput};
+use tk::tokenizer::{EncodeInput, Encoding};
 
 #[derive_ReprC]
 #[ReprC::opaque]
@@ -17,11 +16,7 @@ pub enum InputSequence<'s> {
     VecStr(&'s [&'s str]),
 }
 
-
-//The expect will panic if its a failure
-//Ideally we should wrap into a Option or Result ffi friendly?
 impl FFITokenizer {
-
     pub fn from_pretrained(identifier: &str) -> FFITokenizer {
         let parameters = FromPretrainedParameters::default();
         let tk_result = Tokenizer::from_pretrained(identifier, Some(parameters)).expect("identifier not found");
@@ -29,12 +24,10 @@ impl FFITokenizer {
     }
 
     pub fn encode(&self, input: &InputSequence, add_special_tokens: bool) -> FFIEncoding {
-       let input_sequence = match *input {
-           InputSequence::Str(sequence)  =>
-                tk::InputSequence::from(sequence),
-           InputSequence::VecStr(sequence) =>
-               tk::InputSequence::from(sequence)
-       };
+        let input_sequence = match *input {
+            InputSequence::Str(sequence) => tk::InputSequence::from(sequence),
+            InputSequence::VecStr(sequence) => tk::InputSequence::from(sequence)
+        };
 
         let single_input_sequence = EncodeInput::Single(input_sequence);
         let encoded = self.tokenizer.encode(single_input_sequence, add_special_tokens).expect("encoding failed");
@@ -44,24 +37,19 @@ impl FFITokenizer {
     pub fn encode_batch(&self, input: &Vec<InputSequence>, add_special_tokens: bool) -> repr_c::Vec<repr_c::Box<FFIEncoding>> {
         let encode_inputs: Vec<tk::EncodeInput> = input.as_slice().iter()
             .map(|w| match *w {
-                InputSequence::Str(sequence)  =>
+                InputSequence::Str(sequence) =>
                     EncodeInput::Single(tk::InputSequence::from(sequence)),
                 InputSequence::VecStr(sequence) =>
                     EncodeInput::Single(tk::InputSequence::from(sequence))
-            }
-            )
+            })
             .collect::<Vec<_>>();
 
-            let encoded = self.tokenizer.encode_batch(encode_inputs, add_special_tokens).expect("encoding failed");
-            let ffi_encodings = encoded.as_slice().iter()
-                .map(|e |  repr_c::Box::new(FFIEncoding::from_rust(e.clone()))).collect::<Vec<_>>().into();
-            return ffi_encodings;
-        }
+        let encoded = self.tokenizer.encode_batch(encode_inputs, add_special_tokens).expect("encoding failed");
+        let ffi_encodings = encoded.as_slice().iter()
+            .map(|e| repr_c::Box::new(FFIEncoding::from_rust(e.clone()))).collect::<Vec<_>>().into();
+        return ffi_encodings;
     }
-
-    //TODO: Andrea
-    //encode_pair
-
+}
 
 #[derive_ReprC]
 #[repr(C)]
@@ -71,48 +59,27 @@ pub struct FFIEncoding {
     tokens: repr_c::Vec<char_p::Box>,
     words: repr_c::Vec<i64>,
 }
+
 impl FFIEncoding {
+    fn from_rust(enc: Encoding) -> FFIEncoding {
+        let m_ids = enc.get_ids().iter().map(|i| i64::from(*i));
+        let ids = m_ids.collect::<Vec<_>>().into();
+        let m_type_ids = enc.get_type_ids().iter().map(|i| i64::from(*i));
+        let type_ids = m_type_ids.collect::<Vec<_>>().into();
+        let m_tokens = enc.get_tokens().iter().map(|s| char_p::new(s.clone()));
+        let tokens = m_tokens.collect::<Vec<_>>().into();
+        let m_words = enc.get_word_ids().iter().map(|w| match w {
+            Some(v) => i64::from(*v),
+            None => -1, // to indicate null
+        });
+        let words = m_words.collect::<Vec<_>>().into();
 
-    fn from_rust(encoding: Encoding) -> FFIEncoding {
-        let ids = encoding
-            .get_ids()
-            .iter()
-            .map(|i| i64::from(*i))
-            .collect::<Vec<_>>()
-            .into();
-        let type_ids = encoding
-            .get_type_ids()
-            .iter()
-            .map(|i| i64::from(*i))
-            .collect::<Vec<_>>()
-            .into();
-        let tokens = encoding
-            .get_tokens()
-            .iter()
-            .map(|s| char_p::new(s.clone()))
-            .collect::<Vec<_>>()
-            .into();
-        let words = encoding
-            .get_word_ids()
-            .iter()
-            .map(|w| match w {
-                Some(v) => i64::from(*v),
-                None => -1, // to indicate null
-            })
-            .collect::<Vec<_>>()
-            .into();
-
-        FFIEncoding {
-            ids,
-            type_ids,
-            tokens,
-            words,
-        }
+        FFIEncoding { ids, type_ids, tokens, words }
     }
 }
 
 #[ffi_export]
-fn tokenizer_from_pretrained(ffi_identifier: char_p::Ref ) -> repr_c::Box<FFITokenizer> {
+fn tokenizer_from_pretrained(ffi_identifier: char_p::Ref) -> repr_c::Box<FFITokenizer> {
     let input = ffi_identifier.to_str();
     repr_c::Box::new(FFITokenizer::from_pretrained(input))
 }
@@ -125,18 +92,14 @@ fn encode_from_str(it: &FFITokenizer, ffi_input: char_p::Ref, add_special_tokens
     repr_c::Box::new(encoded)
 }
 
-
 #[ffi_export]
 fn encode_from_vec_str(it: &FFITokenizer, ffi_input: &repr_c::Vec<char_p::Ref>, add_special_tokens: bool) -> repr_c::Box<FFIEncoding>
 {
-    let vec_input = ffi_input.iter()
-        .map(|w| w.to_str())
-        .collect::<Vec<_>>();
+    let vec_input = ffi_input.iter().map(|w| w.to_str()).collect::<Vec<_>>();
     let input = InputSequence::VecStr(&*vec_input);
     let encoded = it.encode(&input, add_special_tokens);
     repr_c::Box::new(encoded)
 }
-
 
 #[ffi_export]
 fn encode_batch(it: &FFITokenizer, ffi_input: &repr_c::Vec<char_p::Ref>, add_special_tokens: bool) -> repr_c::Box<repr_c::Vec<repr_c::Box<FFIEncoding>>>
@@ -147,7 +110,6 @@ fn encode_batch(it: &FFITokenizer, ffi_input: &repr_c::Vec<char_p::Ref>, add_spe
     let encoded = it.encode_batch(&input, add_special_tokens);
     return repr_c::Box::new(encoded);
 }
-
 
 #[ffi_export]
 fn tokenizer_drop(ptr: repr_c::Box<FFITokenizer>) {
