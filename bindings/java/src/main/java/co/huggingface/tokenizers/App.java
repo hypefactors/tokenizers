@@ -1,7 +1,6 @@
 package co.huggingface.tokenizers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class App {
 
@@ -12,13 +11,10 @@ public class App {
         var list = new ArrayList<String>();
         list.add("Hello world");
         list.add("I love Java");
-        list.add("My name is Viet");
-        //var encoding = tokenizer.encode(list, true);
-        //System.out.println(encoding.getIds());
-        //System.out.println(Arrays.toString(encoding.getTypeIds()));
-        //System.out.println(Arrays.toString(encoding.getWordIds()));
-        //System.out.println(encoding.getTokens());
-        var encodings = tokenizer.java_encode_batch(list, true);
-//       System.out.println(encodings.get(0).getTokens().toString());
+        list.add("My name is Viet and Andrea");
+        var encoding = tokenizer.encode(list, true);
+        System.out.println(encoding.getIds());
+        var encodings = tokenizer.encode_batch(list, true);
+        System.out.println(encodings[1].getTokens().toString());
     }
 }

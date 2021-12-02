@@ -41,7 +41,7 @@ impl FFITokenizer {
         return FFIEncoding::from_rust(encoded);
     }
 
-    pub fn encode_batch(&self, input: &Vec<InputSequence>, add_special_tokens: bool) -> repr_c::Vec<FFIEncoding> {
+    pub fn encode_batch(&self, input: &Vec<InputSequence>, add_special_tokens: bool) -> repr_c::Vec<repr_c::Box<FFIEncoding>> {
         let encode_inputs: Vec<tk::EncodeInput> = input.as_slice().iter()
             .map(|w| match *w {
                 InputSequence::Str(sequence)  =>
@@ -54,7 +54,7 @@ impl FFITokenizer {
 
             let encoded = self.tokenizer.encode_batch(encode_inputs, add_special_tokens).expect("encoding failed");
             let ffi_encodings = encoded.as_slice().iter()
-                .map(|e | FFIEncoding::from_rust(e.clone())).collect::<Vec<_>>().into();
+                .map(|e |  repr_c::Box::new(FFIEncoding::from_rust(e.clone()))).collect::<Vec<_>>().into();
             return ffi_encodings;
         }
     }
@@ -125,59 +125,28 @@ fn encode_from_str(it: &FFITokenizer, ffi_input: char_p::Ref, add_special_tokens
     repr_c::Box::new(encoded)
 }
 
-//Im getting errors with this c_slice
-// #[ffi_export]
-// fn encode_from_vec_str(it: &FFITokenizer, ffi_input: c_slice::Ref<char_p::Ref>, add_special_tokens: bool) -> repr_c::Box<FFIEncoding> {
-//     let vec_input = ffi_input.as_slice().iter()
-//         .map(|w| w.to_str())
-//         .collect::<Vec<_>>();
-//     let input = InputSequence::VecStr(&*vec_input);
-//     let encoded = it.encode(&input, add_special_tokens);
-//     repr_c::Box::new(encoded)
-// }
-
 
 #[ffi_export]
-fn encode_batch2(it: &FFITokenizer, ffi_input: &repr_c::Vec<char_p::Ref>, add_special_tokens: bool) // -> repr_c::Vec<FFIEncoding>  {
+fn encode_from_vec_str(it: &FFITokenizer, ffi_input: &repr_c::Vec<char_p::Ref>, add_special_tokens: bool) -> repr_c::Box<FFIEncoding>
 {
-    println!("start");
-    let iter = ffi_input.iter();
-    println!("foo");
-    println!("len {}", ffi_input.len());
-    // println!("count {}", iter.count());
-    iter.for_each(|x| {
-        println!("count");
-        let s = x.to_str().to_string();
-        println!("{}", s);
-    });
-    println!("end");
-
-    // let vec_input = ffi_input.to_vec()
-    //     .map(|w| w.to_str())
-    //     .collect::<Vec<_>>();
-    // let input_sequence = InputSequence::VecStr(&*vec_input);
-    // let input = vec![input_sequence];
-    // let add_special_tokens_bool = if add_special_tokens > 0 { true } else { false };
-    // let encoded = it.encode_batch(&input, add_special_tokens_bool);
-    // return encoded;
+    let vec_input = ffi_input.iter()
+        .map(|w| w.to_str())
+        .collect::<Vec<_>>();
+    let input = InputSequence::VecStr(&*vec_input);
+    let encoded = it.encode(&input, add_special_tokens);
+    repr_c::Box::new(encoded)
 }
 
 
-//-> repr_c::Vec<repr_c::Box<FFIEncoding>>
-// #[ffi_export]
-// fn encode_meh_batch(it: &FFITokenizer, ffi_input: c_slice::Ref<char_p::Ref>, add_special_tokens: bool)  {
-//     println!("START");
-//     let vec_input = ffi_input.as_slice().iter()
-//         .map(|w| w.to_str())
-//         .collect::<Vec<_>>();
-//     let input_sequence = InputSequence::VecStr(&*vec_input);
-//     let input = vec![input_sequence];
-//     let encoded = it.encode_batch(&input, add_special_tokens);
-//     println!("END");
-//    //return encoded;
-// }
-
-//here get a vec of Box
+#[ffi_export]
+fn encode_batch(it: &FFITokenizer, ffi_input: &repr_c::Vec<char_p::Ref>, add_special_tokens: bool) -> repr_c::Box<repr_c::Vec<repr_c::Box<FFIEncoding>>>
+{
+    let input: Vec<InputSequence> = ffi_input.iter()
+        .map(|w| InputSequence::Str(w.to_str()))
+        .collect::<Vec<_>>();
+    let encoded = it.encode_batch(&input, add_special_tokens);
+    return repr_c::Box::new(encoded);
+}
 
 
 #[ffi_export]
@@ -190,7 +159,10 @@ fn encoding_drop(ptr: repr_c::Box<FFIEncoding>) {
     drop(ptr);
 }
 
-//vec encoding drop
+#[ffi_export]
+fn vec_encoding_drop(ptr: repr_c::Box<repr_c::Vec<repr_c::Box<FFIEncoding>>>) {
+    drop(ptr);
+}
 
 /// The following test function is necessary for the header generation.
 /// Headers are only needed during development. It helps inspecting the
