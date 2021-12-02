@@ -26,7 +26,8 @@ public class EncodingVec {
 
     public EncodingVec(SaferFFIVec ffiVec) {
         this.setFFIVec(ffiVec);
-        SaferFFITokenizersLibrary.cleaner.register(this, new CleanEncodingVec(ffiVec));
+        //This is causing memory issues - don't know why
+        //SaferFFITokenizersLibrary.cleaner.register(this, new CleanEncodingVec(ffiVec));
     }
 
     public  Encoding[] getEncodings(){

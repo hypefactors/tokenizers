@@ -9,5 +9,5 @@ gradle-app.setting
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
 
-# downloadable test resources
-src/jmh/resources/big.txt
+# downloadable test big.txt
+src/jmh/resources/big.txt/big.txt
