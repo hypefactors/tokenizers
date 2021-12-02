@@ -8,6 +8,11 @@ public class App {
     public static void main(String[] args) {
         var str = "My name is John";
 
+        try {
+            var tokenizer000 = new TokenizerFromPretrained("bert-base-caseaoeuoaeuoaueoaud");
+        } catch (Throwable e) {
+            System.err.println(e.getMessage());
+        }
         var tokenizer = new TokenizerFromPretrained("bert-base-cased");
         var list = "Tokenize me please!";
 //        var list = new ArrayList<String>();
