@@ -6,7 +6,7 @@ import com.sun.jna.*;
 
 import java.util.List;
 
-public class TokenizerFromPretrained implements WrapsFFIResultType<Pointer> {
+public class TokenizerFromPretrained implements WrapsFFIResultType {
     private Pointer pointer;
 
     private TokenizerFromPretrained(Pointer pointer) {
@@ -22,13 +22,8 @@ public class TokenizerFromPretrained implements WrapsFFIResultType<Pointer> {
         return result;
     }
 
-    @Override
-    public Pointer ok() {
-        return pointer;
-    }
-
     public Result<Encoding> encode(String input, Boolean addSpecialTokens) {
-        var ffiResult = FFILibrary.INSTANCE.encode_from_str(this.ok(), input, addSpecialTokens ? 1 : 0);
+        var ffiResult = FFILibrary.INSTANCE.encode_from_str(this.pointer, input, addSpecialTokens ? 1 : 0);
         var wrapper = ffiResult.value == null ? null : new Encoding(ffiResult.value);
         var result = new Result<Encoding>(ffiResult, wrapper);
 
@@ -49,7 +44,7 @@ public class TokenizerFromPretrained implements WrapsFFIResultType<Pointer> {
         vec.ptr = new StringArray(input.toArray(new String[0]));
         vec.len = new FFILibrary.size_t(input.size());
         vec.cap = new FFILibrary.size_t(input.size());
-        var ffiResult =  FFILibrary.INSTANCE.encode_batch(this.ok(), vec, addSpecialTokens ? 1 : 0);
+        var ffiResult =  FFILibrary.INSTANCE.encode_batch(this.pointer, vec, addSpecialTokens ? 1 : 0);
         var wrapper = ffiResult.value == null ? null : new Encodings(ffiResult.value);
 
         return new Result<Encodings>(ffiResult, wrapper);
