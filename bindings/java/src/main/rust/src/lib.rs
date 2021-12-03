@@ -117,15 +117,6 @@ fn encode_from_str(it: &FFITokenizer, ffi_input: char_p::Ref, add_special_tokens
     repr_c::Box::new(encoded)
 }
 
-// #[ffi_export]
-// fn encode_from_vec_str(it: &FFITokenizer, ffi_input: &repr_c::Vec<char_p::Ref>, add_special_tokens: bool) -> repr_c::Box<FFIEncoding>
-// {
-//     let vec_input = ffi_input.iter().map(|w| w.to_str()).collect::<Vec<_>>();
-//     let input = InputSequence::VecStr(&*vec_input);
-//     let encoded = it.encode(&input, add_special_tokens);
-//     repr_c::Box::new(encoded)
-// }
-
 #[ffi_export]
 fn encode_batch(it: &FFITokenizer, ffi_input: &repr_c::Vec<char_p::Ref>, add_special_tokens: bool)
     -> repr_c::Box<FFIResult<repr_c::Vec<repr_c::Box<FFIEncoding>>>>
