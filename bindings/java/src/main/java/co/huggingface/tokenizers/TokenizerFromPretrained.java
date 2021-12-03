@@ -35,12 +35,16 @@ public class TokenizerFromPretrained {
 
     public static Result<TokenizerFromPretrained> create(String identifier) {
         var ffiResult = FFILibrary.INSTANCE.tokenizer_from_pretrained(identifier);
-        var wrapper = ffiResult.value == null ? null : new TokenizerFromPretrained(ffiResult.value);
-        var result = new Result<TokenizerFromPretrained>(ffiResult, wrapper);
+        TokenizerFromPretrained wrapper = null;
 
-        cleaner.register(result, new CleanTokenizer(ffiResult));
+        if (ffiResult.value != null) {
+            wrapper = new TokenizerFromPretrained(ffiResult.value);
+            cleaner.register(wrapper, new CleanTokenizer(ffiResult));
+        } else {
+            FFILibrary.INSTANCE.tokenizer_drop(ffiResult.getPointer());
+        }
 
-        return result;
+        return new Result<TokenizerFromPretrained>(ffiResult, wrapper);
     }
 
     public Result<Encoding> encode(String input, Boolean addSpecialTokens) {
