@@ -18,8 +18,8 @@ public interface FFILibrary extends Library {
     // getting & dropping encoders
     FFIResult.Encoding encode_from_str(Pointer tokenizer, String input, int addSpecialTokens);
 //    FFIEncoding encode_from_vec_str(Pointer tokenizer, FFIVec slice, int addSpecialTokens);
-    FFIVec encode_batch(Pointer tokenizer, FFIVec slice, int addSpecialTokens);
+    FFIResult.Encodings encode_batch(Pointer tokenizer, FFIVec inputs, int addSpecialTokens);
 
-    void encoding_drop(Pointer encoding);
-    void vec_encoding_drop(FFIVec vector);
+    void encoding_drop(Pointer encodingResult);
+    void encodings_drop(Pointer encodingsResult);
 }
