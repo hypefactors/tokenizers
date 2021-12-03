@@ -1,6 +1,7 @@
 plugins {
     //TODO: make type library and move App to examples
-    id 'application'
+    id 'java-library'
+    id 'maven-publish'
     id "com.diffplug.spotless" version "6.0.0"
     id "de.undercouch.download" version "4.1.2"
     id "me.champeau.jmh" version "0.6.6" // benchmarking: $ gradle jmh
@@ -79,8 +80,16 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
 
-application {
-    mainClass = 'co.huggingface.tokenizers.App'
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+              groupId = group
+              artifactId = 'java-tokenizers'
+              version = version
+
+              from components.java
+        }
+    }
 }
 
 test {
