@@ -31,6 +31,7 @@ public class TokenizerFromPretrainedTests {
     }
 
     //cannot fetch model from "google/mt5-base"
+    //we can only fetch when there is a tokenizer.json in model hub
     @Test
     void testEncodeUnigram() {
         var tokenizer = TokenizerFromPretrained.create("t5-small").value();
@@ -55,16 +56,33 @@ public class TokenizerFromPretrainedTests {
 
     }
 
+    @Test
     void testEncodeBPE() {
-//        System.out.println("foo");
-        assertEquals(0,0);
+        var tokenizer = TokenizerFromPretrained.create("gpt2").value();
+        var input = "Tokenize me please!";
+        var encodings = tokenizer.encode(input, true).value();
+
+        var expectedTokens = new String[] {"Token", "ize", "Ġme", "Ġplease", "!"};
+        var expectedIds = new long[] {30642L, 1096L, 502L, 3387L, 0L};
+        var expectedTypeIds = new long[] {0L, 0L, 0L, 0L, 0L};
+        var expectedWordIds = new long[] {0L, 0L, 1L, 2L, 3L};
+
+        var tokens = encodings.getTokens();
+        var ids = encodings.getIds();
+        var typeIds = encodings.getTypeIds();
+        var wordIds = encodings.getWordIds();
+
+        assertArrayEquals(expectedTokens,tokens);
+        assertArrayEquals(expectedIds, ids);
+        assertArrayEquals(expectedTypeIds, typeIds);
+        assertArrayEquals(expectedWordIds, wordIds);
+
     }
 
-    //test from pretrained wordpiece
-    //test from pretrained unigram
-    //test labse
-    //test BPE
-    //test pair thingie (it should crash)
-
+    @Test
+    void testNonExistentModel(){
+       String errorMessage = TokenizerFromPretrained.create("boohoo").error();
+       assertEquals("Model \"boohoo\" on the Hub doesn't have a tokenizer", errorMessage);
+    }
 
 }
