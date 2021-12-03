@@ -1,44 +1,20 @@
 package co.huggingface.tokenizers;
 
 import com.sun.jna.*;
-import com.sun.jna.ptr.PointerByReference;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class TokenizerFromPretrained extends PointerType {
-
-    // according to https://techinplanet.com/java-9-cleaner-cleaner-cleanable-objects/,
-    // it is wise to keep the cleaner runnables as a static class
-    private static class CleanTokenizer implements Runnable {
-        private Pointer ptr;
-
-        public CleanTokenizer(Pointer ptr) {
-            this.ptr = ptr;
-        }
-
-        @Override
-        public void run() {
-            SaferFFITokenizersLibrary.INSTANCE.tokenizer_drop(ptr);
-        }
-    }
 
     private Pointer ffiTokenizer;
 
     public TokenizerFromPretrained(String identifier) throws ExceptionInInitializerError {
-        var result = SaferFFITokenizersLibrary.INSTANCE.tokenizer_from_pretrained(identifier);
-        if (result.error != null || result.value == null) {
-            var message = result.error == null ? "unknown init error" : result.error;
-            throw new ExceptionInInitializerError(message);
+        var ffiResult = SaferFFITokenizersLibrary.INSTANCE.tokenizer_from_pretrained(identifier);
+        var result = new Result<SaferFFIResultTokenizer>(ffiResult);
+        if (result.error() != null) {
+            throw new ExceptionInInitializerError(result.error());
         }
 
-        var resultPtr = result.getPointer();
-        this.ffiTokenizer = result.value;
-        this.setPointer(resultPtr);
-        SaferFFITokenizersLibrary.cleaner.register(this, new CleanTokenizer(resultPtr));
+        this.ffiTokenizer = result.getPointer();
     }
 
     public Encoding encode(String input, Boolean addSpecialTokens) {

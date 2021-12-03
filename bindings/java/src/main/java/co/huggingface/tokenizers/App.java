@@ -21,6 +21,7 @@ public class App {
 //        list.add("My name is Viet and Andrea");
         var encoding = tokenizer.encode(list, true);
         System.out.println(Arrays.toString(encoding.getWordIds()));
+        System.out.println(Arrays.toString(encoding.getTokens()));
        // var encodings = tokenizer.encode_batch(list, true);
         //System.out.println(encodings[1].getTokens().toString());
     }

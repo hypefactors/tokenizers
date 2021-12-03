@@ -1,7 +1,6 @@
 package co.huggingface.tokenizers;
 
 import com.sun.jna.*;
-import com.sun.jna.ptr.PointerByReference;
 
 import java.lang.ref.Cleaner;
 
@@ -18,7 +17,7 @@ public interface SaferFFITokenizersLibrary extends Library {
     }
 
     // getting & dropping tokenizers
-    SaferFFIOpaqueResult tokenizer_from_pretrained(String identifier);
+    SaferFFIResultTokenizer tokenizer_from_pretrained(String identifier);
     void tokenizer_drop(Pointer tokenizerResult);
 
     // getting & dropping encoders

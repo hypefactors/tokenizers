@@ -1,6 +1,7 @@
 package co.huggingface.tokenizers;
 
 import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
 
 public class Encoding {
 

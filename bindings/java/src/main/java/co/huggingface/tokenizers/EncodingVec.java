@@ -1,6 +1,7 @@
 package co.huggingface.tokenizers;
 
 import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
 
 public class EncodingVec {
 
@@ -38,7 +39,7 @@ public class EncodingVec {
 
         for (int i = 0; i < len; i++) {
             Pointer pp = parray[i];
-            SaferFFIEncoding ffiEncoding = new SaferFFIEncoding(pp);
+            SaferFFIEncoding ffiEncoding = Structure.newInstance(SaferFFIEncoding.class, pp);
             encodings[i] = new Encoding(ffiEncoding);
         }
 
