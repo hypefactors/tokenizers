@@ -9,12 +9,11 @@ public class Encodings {
 
     public Encodings(Pointer ptr) {
         assert(ptr != null);
-        var ffiVec = new FFIVec(ptr);
 
-        Pointer vecStartPtr = ffiVec.ptr;
+        var ffiVec = new FFIVec(ptr);
         int vecLen = ffiVec.len.intValue();
         this.encodings = new Encoding[vecLen];
-        Pointer[] vecPointers = vecStartPtr.getPointerArray(0, vecLen);
+        Pointer[] vecPointers = ffiVec.ptr.getPointerArray(0, vecLen);
 
         for (int i = 0; i < vecLen; i++) {
             encodings[i] = new Encoding(vecPointers[i]);

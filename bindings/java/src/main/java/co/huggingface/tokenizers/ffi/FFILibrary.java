@@ -3,7 +3,7 @@ package co.huggingface.tokenizers.ffi;
 import com.sun.jna.*;
 
 public interface FFILibrary extends Library {
-    FFILibrary INSTANCE = (FFILibrary) Native.load("safer_ffi_tokenizers", FFILibrary.class);
+    FFILibrary INSTANCE = Native.load("safer_ffi_tokenizers", FFILibrary.class);
 
     // handling unsigned ints as size_t
     public static class size_t extends IntegerType {
