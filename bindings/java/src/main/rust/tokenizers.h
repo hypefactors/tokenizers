@@ -72,7 +72,15 @@ typedef struct {
 
 } FFIEncoding_t;
 
-FFIEncoding_t * encode_from_str (
+typedef struct {
+
+    FFIEncoding_t * value;
+
+    char * error;
+
+} FFIResult_FFIEncoding_t;
+
+FFIResult_FFIEncoding_t * encode_from_str (
     FFITokenizer_t const * it,
     char const * ffi_input,
     bool add_special_tokens);
@@ -89,11 +97,6 @@ typedef struct {
     size_t cap;
 
 } Vec_char_const_ptr_t;
-
-FFIEncoding_t * encode_from_vec_str (
-    FFITokenizer_t const * it,
-    Vec_char_const_ptr_t const * ffi_input,
-    bool add_special_tokens);
 
 /** \brief
  *  Same as [`Vec<T>`][`rust::Vec`], but with guaranteed `#[repr(C)]` layout
@@ -117,7 +120,7 @@ void tokenizer_drop (
     FFIResult_FFITokenizer_t * ptr);
 
 void encoding_drop (
-    FFIEncoding_t * ptr);
+    FFIResult_FFIEncoding_t * ptr);
 
 void vec_encoding_drop (
     Vec_FFIEncoding_ptr_t * ptr);

@@ -16,8 +16,8 @@ public interface FFILibrary extends Library {
     void tokenizer_drop(Pointer tokenizerResult);
 
     // getting & dropping encoders
-    FFIEncoding encode_from_str(Pointer tokenizer, String input, int addSpecialTokens);
-    FFIEncoding encode_from_vec_str(Pointer tokenizer, FFIVec slice, int addSpecialTokens);
+    FFIResult.Encoding encode_from_str(Pointer tokenizer, String input, int addSpecialTokens);
+//    FFIEncoding encode_from_vec_str(Pointer tokenizer, FFIVec slice, int addSpecialTokens);
     FFIVec encode_batch(Pointer tokenizer, FFIVec slice, int addSpecialTokens);
 
     void encoding_drop(Pointer encoding);

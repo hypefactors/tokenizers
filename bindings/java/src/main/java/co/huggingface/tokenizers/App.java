@@ -15,13 +15,16 @@ public class App {
         var tokenizer = tk2.value();
 
         var list = "Tokenize me please!";
+        var encoding = tokenizer.encode(str, true);
+        System.out.println(encoding.value());
+        System.out.println(Arrays.toString(encoding.value().getTokens()));
 //        var list = new ArrayList<String>();
 //        list.add("Hello world");
 //        list.add("I love Java");
 //        list.add("My name is Viet and Andrea");
-        var encoding = tokenizer.encode(list, true);
-        System.out.println(Arrays.toString(encoding.getWordIds()));
-        System.out.println(Arrays.toString(encoding.getTokens()));
+//        var encoding = tokenizer.encode(list, true);
+//        System.out.println(Arrays.toString(encoding.getWordIds()));
+//        System.out.println(Arrays.toString(encoding.getTokens()));
        // var encodings = tokenizer.encode_batch(list, true);
         //System.out.println(encodings[1].getTokens().toString());
     }
