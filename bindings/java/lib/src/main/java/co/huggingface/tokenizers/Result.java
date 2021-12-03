@@ -2,6 +2,9 @@ package co.huggingface.tokenizers;
 
 import co.huggingface.tokenizers.ffi.FFIResult;
 
+/**
+ * {@code Result} wraps the result of ffi calls
+ */
 public class Result<T> {
 
     private FFIResult ffiResult;

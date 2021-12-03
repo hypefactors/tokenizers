@@ -11,4 +11,4 @@ gradle-app.setting
 !gradle-wrapper.jar
 
 # downloadable test big.txt
-src/jmh/resources/big.txt/big.txt
+lib/src/jmh/resources/big.txt
