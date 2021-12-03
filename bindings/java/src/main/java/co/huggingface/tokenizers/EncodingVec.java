@@ -1,31 +1,20 @@
 package co.huggingface.tokenizers;
 
+import co.huggingface.tokenizers.ffi.FFILibrary;
+import co.huggingface.tokenizers.ffi.FFIEncoding;
+import co.huggingface.tokenizers.ffi.FFIVec;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 
 public class EncodingVec {
 
-    private SaferFFIVec ffiVec;
+    private FFIVec ffiVec;
 
-
-    private static class CleanEncodingVec implements Runnable {
-        private SaferFFIVec ffiVec;
-
-        public CleanEncodingVec(SaferFFIVec ptr) {
-            this.ffiVec = ptr;
-        }
-
-        @Override
-        public void run() {
-            SaferFFITokenizersLibrary.INSTANCE.vec_encoding_drop(ffiVec);
-        }
-    }
-
-    private void setFFIVec(SaferFFIVec ffiVec){
+    private void setFFIVec(FFIVec ffiVec){
         this.ffiVec = ffiVec;
     }
 
-    public EncodingVec(SaferFFIVec ffiVec) {
+    public EncodingVec(FFIVec ffiVec) {
         this.setFFIVec(ffiVec);
         //This is causing memory issues - don't know why
         //SaferFFITokenizersLibrary.cleaner.register(this, new CleanEncodingVec(ffiVec));
@@ -39,7 +28,7 @@ public class EncodingVec {
 
         for (int i = 0; i < len; i++) {
             Pointer pp = parray[i];
-            SaferFFIEncoding ffiEncoding = Structure.newInstance(SaferFFIEncoding.class, pp);
+            FFIEncoding ffiEncoding = Structure.newInstance(FFIEncoding.class, pp);
             encodings[i] = new Encoding(ffiEncoding);
         }
 

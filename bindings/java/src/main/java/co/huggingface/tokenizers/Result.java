@@ -1,45 +1,52 @@
 package co.huggingface.tokenizers;
 
-import com.sun.jna.Pointer;
-import com.sun.jna.Structure;
+import co.huggingface.tokenizers.ffi.FFIResult;
 
-public class Result<T extends Structure> {
+import java.lang.ref.Cleaner;
 
-    private SaferFFIResult ffiResult;
+public class Result<T extends WrapsFFIResultType> {
+
+    private FFIResult ffiResult;
+
+    private T value;
 
     // according to https://techinplanet.com/java-9-cleaner-cleaner-cleanable-objects/,
     // it is wise to keep the cleaner runnables as a static class
-    private static class CleanResult implements Runnable {
-        private SaferFFIResult result;
+    // to automatically free memory on the Rust side when GC'ed on JVM
+    private static final Cleaner cleaner = Cleaner.create();
 
-        public CleanResult(SaferFFIResult result) {
+    private static class CleanResult implements Runnable {
+        private FFIResult result;
+
+        public CleanResult(FFIResult result) {
             this.result = result;
         }
 
         @Override
-        public void run() { result.drop(); }
-    }
-
-    public Result(SaferFFIResult ffiResult) {
-        this.ffiResult = ffiResult;
-        SaferFFITokenizersLibrary.cleaner.register(this, new CleanResult(ffiResult));
-    }
-
-    public T ok(Class<T> type) {
-        if (ffiResult.value != null) {
-            return Structure.newInstance(type, ffiResult.value);
+        public void run() {
+            result.drop();
         }
-
-        return null;
     }
 
-    public Pointer getPointer() {
-        return ffiResult.value;
+    public Result(FFIResult ffiResult, T value) {
+        this.ffiResult = ffiResult;
+        this.value = value;
+        cleaner.register(this, new CleanResult(ffiResult));
     }
 
-    public String error() { return ffiResult.error; }
+    public T value() {
+        return this.value;
+    }
 
-    public boolean hasError() { return ffiResult.error != null; }
+    public String error() {
+        return ffiResult.error;
+    }
 
-    public boolean hasValue() { return ffiResult.value != null; }
+    public boolean isError() {
+        return ffiResult.error != null;
+    }
+
+    public boolean hasValue() {
+        return ffiResult.value != null;
+    }
 }
