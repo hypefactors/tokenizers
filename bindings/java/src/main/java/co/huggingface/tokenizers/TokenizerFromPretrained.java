@@ -1,7 +1,10 @@
 package co.huggingface.tokenizers;
 
 import co.huggingface.tokenizers.ffi.FFILibrary;
+import co.huggingface.tokenizers.ffi.FFIVec;
 import com.sun.jna.*;
+
+import java.util.List;
 
 public class TokenizerFromPretrained implements WrapsFFIResultType<Pointer> {
     private Pointer pointer;
@@ -41,13 +44,14 @@ public class TokenizerFromPretrained implements WrapsFFIResultType<Pointer> {
 //        return new Encoding(ffiEncoding);
 //    }
 
-//    public Encoding[] encode_batch(List<String> input, Boolean addSpecialTokens) {
-//        FFIVec vec = new FFIVec();
-//        vec.ptr = new StringArray(input.toArray(new String[0]));
-//        vec.len = new FFILibrary.size_t(input.size());
-//        vec.cap = new FFILibrary.size_t(input.size());
-//        var result =  FFILibrary.INSTANCE.encode_batch(this.ok(), vec, addSpecialTokens ? 1 : 0);
-//        var encodingArray =  new EncodingVec(result);
-//        return encodingArray.getEncodings();
-//    }
+    public Result<Encodings> encode_batch(List<String> input, Boolean addSpecialTokens) {
+        FFIVec vec = new FFIVec();
+        vec.ptr = new StringArray(input.toArray(new String[0]));
+        vec.len = new FFILibrary.size_t(input.size());
+        vec.cap = new FFILibrary.size_t(input.size());
+        var ffiResult =  FFILibrary.INSTANCE.encode_batch(this.ok(), vec, addSpecialTokens ? 1 : 0);
+        var wrapper = ffiResult.value == null ? null : new Encodings(ffiResult.value);
+
+        return new Result<Encodings>(ffiResult, wrapper);
+    }
 }

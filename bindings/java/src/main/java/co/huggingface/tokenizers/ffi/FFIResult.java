@@ -23,4 +23,11 @@ public abstract class FFIResult extends Structure {
             FFILibrary.INSTANCE.encoding_drop(this.getPointer());
         }
     }
+
+    public static class Encodings extends FFIResult {
+        @Override
+        public void drop() {
+            FFILibrary.INSTANCE.encodings_drop(this.getPointer());
+        }
+    }
 }

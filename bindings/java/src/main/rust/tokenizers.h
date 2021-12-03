@@ -111,7 +111,15 @@ typedef struct {
 
 } Vec_FFIEncoding_ptr_t;
 
-Vec_FFIEncoding_ptr_t * encode_batch (
+typedef struct {
+
+    Vec_FFIEncoding_ptr_t * value;
+
+    char * error;
+
+} FFIResult_Vec_FFIEncoding_ptr_t;
+
+FFIResult_Vec_FFIEncoding_ptr_t * encode_batch (
     FFITokenizer_t const * it,
     Vec_char_const_ptr_t const * ffi_input,
     bool add_special_tokens);
@@ -122,8 +130,8 @@ void tokenizer_drop (
 void encoding_drop (
     FFIResult_FFIEncoding_t * ptr);
 
-void vec_encoding_drop (
-    Vec_FFIEncoding_ptr_t * ptr);
+void encodings_drop (
+    FFIResult_Vec_FFIEncoding_ptr_t * ptr);
 
 
 #ifdef __cplusplus
