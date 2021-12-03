@@ -29,7 +29,7 @@ public class EncodingBenchmark {
         public void setUp() throws IOException {
             bigInput = this.getResourceAsString("big.txt");
             batchInput = this.getBatch(bigInput);
-            tokenizer = new TokenizerFromPretrained("bert-base-cased");
+            tokenizer = TokenizerFromPretrained.create("bert-base-cased").value();
         }
 
         String getResourceAsString(String filename) throws IOException {
