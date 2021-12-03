@@ -1,3 +1,11 @@
+//! The general Rust <-> Java interop strategy is as follows:
+//! - Data passed to function calls are passed by reference.
+//! - Data returned from function calls is passed by reference.
+//!
+//! We used safer-ffi to build an unsafe-free C-compatible interface to the fast tokenizers.
+//!
+//! Typically, the data is owned on the Rust side and needs to be explicitly released in Rust.
+
 extern crate tokenizers as tk;
 
 use ::safer_ffi::prelude::*;
@@ -5,19 +13,29 @@ use tk::tokenizer::{EncodeInput, Encoding};
 use tk::FromPretrainedParameters;
 use tk::Tokenizer;
 
+/// FFIResult is the FFI representation of Rust's Result type.
+///
+/// Note: value and error cannot both be None at the same time, nor be Some at the same time.
 #[derive_ReprC]
 #[repr(C)]
 pub struct FFIResult<T> {
+    /// value = None if the Result is not OK
     value: Option<repr_c::Box<T>>,
+    /// error = None if the Result is OK
     error: Option<char_p::Box>,
 }
 
+/// FFITokenizer is the FFI representation of fast-tokenizer Tokenizer instance.
 #[derive_ReprC]
 #[ReprC::opaque]
 pub struct FFITokenizer {
     tokenizer: Tokenizer,
 }
 
+/// Fast tokenizers supports various inputs
+/// (e.g. single input, paired input, partially-pre-tokenized, batch)
+///
+/// This version currently only supports single input and batch
 pub enum InputSequence<'s> {
     Str(&'s str),
     VecStr(&'s [&'s str]),
@@ -95,6 +113,12 @@ impl FFITokenizer {
     }
 }
 
+/// FFIEncoding is the FFI-representation of Encoding
+///
+/// Fast tokenizers typically uses u32 for ids. Java however does not support unsigned integers
+/// as a primitive datatype natively. That's why those cases are converted to i64.
+///
+/// For the cases an Option<u32> is returned, we map the None case to -1.
 #[derive_ReprC]
 #[repr(C)]
 pub struct FFIEncoding {
