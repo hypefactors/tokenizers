@@ -1,13 +1,32 @@
 package co.huggingface.tokenizers;
 
 import co.huggingface.tokenizers.ffi.FFILibrary;
+import co.huggingface.tokenizers.ffi.FFIResult;
 import co.huggingface.tokenizers.ffi.FFIVec;
 import com.sun.jna.*;
 
+import java.lang.ref.Cleaner;
 import java.util.List;
 
-public class TokenizerFromPretrained implements WrapsFFIResultType {
+public class TokenizerFromPretrained {
     private Pointer pointer;
+
+    // according to https://techinplanet.com/java-9-cleaner-cleaner-cleanable-objects/,
+    // it is wise to keep the cleaner runnables as a static class
+    // to automatically free memory on the Rust side when GC'ed on JVM
+    private static final Cleaner cleaner = Cleaner.create();
+    private static class CleanTokenizer implements Runnable {
+        private FFIResult result;
+
+        public CleanTokenizer(FFIResult result) {
+            this.result = result;
+        }
+
+        @Override
+        public void run() {
+            FFILibrary.INSTANCE.tokenizer_drop(result.getPointer());
+        }
+    }
 
     private TokenizerFromPretrained(Pointer pointer) {
         assert(pointer != null);
@@ -19,25 +38,18 @@ public class TokenizerFromPretrained implements WrapsFFIResultType {
         var wrapper = ffiResult.value == null ? null : new TokenizerFromPretrained(ffiResult.value);
         var result = new Result<TokenizerFromPretrained>(ffiResult, wrapper);
 
+        cleaner.register(result, new CleanTokenizer(ffiResult));
+
         return result;
     }
 
     public Result<Encoding> encode(String input, Boolean addSpecialTokens) {
         var ffiResult = FFILibrary.INSTANCE.encode_from_str(this.pointer, input, addSpecialTokens ? 1 : 0);
         var wrapper = ffiResult.value == null ? null : new Encoding(ffiResult.value);
-        var result = new Result<Encoding>(ffiResult, wrapper);
+        FFILibrary.INSTANCE.encoding_drop(ffiResult.getPointer());
 
-        return result;
+        return new Result<Encoding>(ffiResult, wrapper);
     }
-
-//    public Encoding encode(List<String> input, Boolean addSpecialTokens) {
-//        FFIVec stringArray = new FFIVec();
-//        stringArray.ptr = new StringArray(input.toArray(new String[0]));
-//        stringArray.len = new FFILibrary.size_t(input.size());
-//        stringArray.cap = new FFILibrary.size_t(input.size());
-//        var ffiEncoding = FFILibrary.INSTANCE.encode_from_vec_str(this.ok(), stringArray, addSpecialTokens ? 1 : 0);
-//        return new Encoding(ffiEncoding);
-//    }
 
     public Result<Encodings> encode_batch(List<String> input, Boolean addSpecialTokens) {
         FFIVec vec = new FFIVec();
@@ -46,6 +58,7 @@ public class TokenizerFromPretrained implements WrapsFFIResultType {
         vec.cap = new FFILibrary.size_t(input.size());
         var ffiResult =  FFILibrary.INSTANCE.encode_batch(this.pointer, vec, addSpecialTokens ? 1 : 0);
         var wrapper = ffiResult.value == null ? null : new Encodings(ffiResult.value);
+        FFILibrary.INSTANCE.encodings_drop(ffiResult.getPointer());
 
         return new Result<Encodings>(ffiResult, wrapper);
     }

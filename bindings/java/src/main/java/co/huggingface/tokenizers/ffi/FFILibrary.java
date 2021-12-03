@@ -12,13 +12,12 @@ public interface FFILibrary extends Library {
     }
 
     // getting & dropping tokenizers
-    FFIResult.Tokenizer tokenizer_from_pretrained(String identifier);
+    FFIResult tokenizer_from_pretrained(String identifier);
     void tokenizer_drop(Pointer tokenizerResult);
 
     // getting & dropping encoders
-    FFIResult.Encoding encode_from_str(Pointer tokenizer, String input, int addSpecialTokens);
-//    FFIEncoding encode_from_vec_str(Pointer tokenizer, FFIVec slice, int addSpecialTokens);
-    FFIResult.Encodings encode_batch(Pointer tokenizer, FFIVec inputs, int addSpecialTokens);
+    FFIResult encode_from_str(Pointer tokenizer, String input, int addSpecialTokens);
+    FFIResult encode_batch(Pointer tokenizer, FFIVec inputs, int addSpecialTokens);
 
     void encoding_drop(Pointer encodingResult);
     void encodings_drop(Pointer encodingsResult);

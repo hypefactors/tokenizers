@@ -3,7 +3,7 @@ package co.huggingface.tokenizers;
 import co.huggingface.tokenizers.ffi.FFIVec;
 import com.sun.jna.Pointer;
 
-public class Encodings implements WrapsFFIResultType {
+public class Encodings {
 
     private Encoding[] encodings;
 
@@ -21,7 +21,7 @@ public class Encodings implements WrapsFFIResultType {
         }
     }
 
-    public  Encoding[] getEncodings(){
+    public Encoding[] getEncodings(){
         return this.encodings;
     }
 }

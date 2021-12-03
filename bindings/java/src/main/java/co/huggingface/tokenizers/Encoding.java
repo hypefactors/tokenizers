@@ -3,7 +3,7 @@ package co.huggingface.tokenizers;
 import co.huggingface.tokenizers.ffi.FFIEncoding;
 import com.sun.jna.Pointer;
 
-public class Encoding implements WrapsFFIResultType {
+public class Encoding {
 
     private long[] ids;
     private long[] typeIds;
