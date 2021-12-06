@@ -29,7 +29,7 @@ def moveTarget(String os) {
     }
 }
 
-task buildProject {
+task buildRust {
     inputs.dir('src/main/rust')
     outputs.dir('src/main/rust/target')
     doLast {
@@ -47,10 +47,9 @@ task buildProject {
     }
 }
 
-compileJava.dependsOn buildProject
+compileJava.dependsOn buildRust
 
 jmh {
-    jvmArgs = ['-Djmh.ignoreLock=true']
     download {
         src 'https://norvig.com/big.txt'
         dest 'src/jmh/resources'
@@ -84,7 +83,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
               groupId = group
-              artifactId = 'tokenizers'
+              artifactId = 'jvm-tokenizers'
               version = version
 
               from components.java

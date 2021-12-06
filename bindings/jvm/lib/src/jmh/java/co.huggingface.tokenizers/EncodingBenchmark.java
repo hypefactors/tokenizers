@@ -3,6 +3,7 @@ package co.huggingface.tokenizers;
 import org.openjdk.jmh.annotations.*;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class EncodingBenchmark {
                 "Copyright laws are changing all over the world. Be sure to check the\n" +
                 "copyright laws for your country before downloading or redistributing\n" +
                 "this or any other Project Gutenberg eBook.";
-        private int batchSize = 6;
+        private int batchSize = 20;
 
         @Setup(Level.Invocation)
         public void setUp() throws IOException {
@@ -43,9 +44,13 @@ public class EncodingBenchmark {
         }
 
         List<String> getBatch(String input) throws IOException {
-            String[] array = new String[batchSize];
-            for(int i = 0; i < batchSize; i++) array[i] = bigInput;
-            return Arrays.asList(array);
+            var chunkSize = (input.length() / batchSize);
+            var result = new ArrayList<String>(batchSize);
+            for(int i = 0; i < batchSize; i++) {
+                var substr = input.substring(i * chunkSize, (i + 1) * chunkSize);
+                result.add(substr);
+            }
+            return result;
         }
     }
 
