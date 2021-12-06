@@ -16,6 +16,11 @@ extern "C" {
 
 typedef struct FFITokenizer FFITokenizer_t;
 
+/** \brief
+ *  FFIResult is the FFI representation of Rust's Result type.
+ * 
+ *  Note: value and error cannot both be None at the same time, nor be Some at the same time.
+ */
 typedef struct {
 
     FFITokenizer_t * value;
@@ -60,6 +65,14 @@ typedef struct {
 
 } Vec_char_ptr_t;
 
+/** \brief
+ *  FFIEncoding is the FFI-representation of Encoding
+ * 
+ *  Fast tokenizers typically uses u32 for ids. Java however does not support unsigned integers
+ *  as a primitive datatype natively. That's why those cases are converted to i64.
+ * 
+ *  For the cases an Option<u32> is returned, we map the None case to -1.
+ */
 typedef struct {
 
     Vec_int64_t ids;
@@ -72,6 +85,11 @@ typedef struct {
 
 } FFIEncoding_t;
 
+/** \brief
+ *  FFIResult is the FFI representation of Rust's Result type.
+ * 
+ *  Note: value and error cannot both be None at the same time, nor be Some at the same time.
+ */
 typedef struct {
 
     FFIEncoding_t * value;
@@ -111,6 +129,11 @@ typedef struct {
 
 } Vec_FFIEncoding_ptr_t;
 
+/** \brief
+ *  FFIResult is the FFI representation of Rust's Result type.
+ * 
+ *  Note: value and error cannot both be None at the same time, nor be Some at the same time.
+ */
 typedef struct {
 
     Vec_FFIEncoding_ptr_t * value;

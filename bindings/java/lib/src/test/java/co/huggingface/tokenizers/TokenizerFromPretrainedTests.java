@@ -80,6 +80,29 @@ public class TokenizerFromPretrainedTests {
     }
 
     @Test
+    void testWithoutSpecialTokens() {
+        var tokenizer = TokenizerFromPretrained.create("bert-base-cased").value();
+        var input = "Tokenize me please!";
+        var encodings = tokenizer.encode(input, false).value();
+
+        var expectedTokens = new String[] { "To", "##ken", "##ize", "me", "please", "!"};
+        var expectedIds = new long[] {1706L, 6378L, 3708L, 1143L, 4268L, 106L};
+        var expectedTypeIds = new long[] {0L, 0L, 0L, 0L, 0L, 0L};
+        var expectedWordIds = new long[] {0L, 0L, 0L, 1L, 2L, 3L};
+
+        var tokens = encodings.getTokens();
+        var ids = encodings.getIds();
+        var typeIds = encodings.getTypeIds();
+        var wordIds = encodings.getWordIds();
+
+        assertArrayEquals(expectedTokens,tokens);
+        assertArrayEquals(expectedIds, ids);
+        assertArrayEquals(expectedTypeIds, typeIds);
+        assertArrayEquals(expectedWordIds, wordIds);
+
+    }
+
+    @Test
     void testNonExistentModel(){
        String errorMessage = TokenizerFromPretrained.create("boohoo").error();
        assertEquals("Model \"boohoo\" on the Hub doesn't have a tokenizer", errorMessage);
