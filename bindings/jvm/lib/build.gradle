@@ -84,7 +84,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
               groupId = group
-              artifactId = 'java-tokenizers'
+              artifactId = 'tokenizers'
               version = version
 
               from components.java

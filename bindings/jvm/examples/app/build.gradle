@@ -22,7 +22,7 @@ repositories {
 dependencies {
     // This dependency is used by the application.
     //implementation project(":java-tokenizers")
-   implementation 'co.huggingface:java-tokenizers:1.0-SNAPSHOT'
+   implementation 'co.huggingface:tokenizers:1.0-SNAPSHOT'
 }
 
 testing {
